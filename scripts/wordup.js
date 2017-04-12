@@ -49,14 +49,30 @@ function endGame() {
  * Refrains from adding a new entry if the model already contains
  * a wordSubmission whose word is the same
  */
-function addNewWordSubmission(word) {
+ //var wordIndex = model.wordSubmissions.findIndex(
+        //function(elem, index, array){
+        //return elem.word == this;
+ //}, word);
+ //if (theAnswer.length > 0 ){
+    //model.wordSubmissions[wordIndex].isRealWord = true;
+// }
+// else{
+    //model.wordSubmissions[wordIndex].isRealWord = false;
+ //}
+ function addNewWordSubmission(word) {
     // Do we already have a wordSubmission with this word?
     // TODO 21
     // replace the hardcoded 'false' with the real answer
-    var alreadyUsed = false;
+    //var alreadyUsed = false;
+    var wordIndex = model.wordSubmissions.findIndex(
+           function(elem, index, array){
+           return elem.word == this;
+    }, word);
 
+    //console.log(wordIndex);
+    //console.log(alreadyUsed);
     // if the word is valid and hasn't already been used, add it
-    if (containsOnlyAllowedLetters(word) && alreadyUsed == false) {
+    if (containsOnlyAllowedLetters(word) && wordIndex == -1) {
         model.wordSubmissions.push({ word: word });
         // and now we must also determine whether this is actually a real word
         checkIfWordIsReal(word);
@@ -88,14 +104,12 @@ function addNewWordSubmission(word) {
              // If the response contains any results, then the word is legitimate.
              // Otherwise, it is not.
              var theAnswer = (response.results);
-             console.log("We got" + theAnswer);
              // TODO 15
              // Update the corresponding wordSubmission in the model
              var wordIndex = model.wordSubmissions.findIndex(
                     function(elem, index, array){
                     return elem.word == this;
             }, word);
-
 
             if (theAnswer.length > 0 ){
                 model.wordSubmissions[wordIndex].isRealWord = true;
@@ -231,12 +245,13 @@ function wordSubmissionChip(wordSubmission) {
 
         // TODO 17
         // give the scoreChip appropriate text content
-        if (wordSubmission["isRealWord"] == true){
-          scoreChip = scoreChip.innertext = ("M");
-          $(".tag-sm").css("background-color", "blue");
+        if (wordSubmission.isRealWord == true){
+          scoreChip.text(wordScore(wordSubmission.word));
+          scoreChip.attr("class", "tag tag-sm tag-primary");
         }
         else{
-          scoreChip = scoreChip.innertext =("X");
+          scoreChip.text("x");
+          scoreChip.attr("class", "tag tag-sm tag-danger");
         }
         // TODO 18
         // give the scoreChip appropriate css classes
@@ -373,9 +388,8 @@ function wordScore(word) {
     // TODO 19
     // Replace the empty list below.
     // Map the list of letters into a list of scores, one for each letter.
-    var letterScores = [];
+    var letterScores = letters.map(letterScore);
 
-    // return the total sum of the letter scores
     return letterScores.reduce(add, 0);
 }
 
@@ -397,7 +411,7 @@ function currentScore() {
 
     // TODO 20
     // return the total sum of the word scores
-    return 0;
+    return wordScores.reduce(add, 0);
 }
 
 
